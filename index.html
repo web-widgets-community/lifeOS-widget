@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIFE // OS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+<div class="scanline"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- HEADER -->
+<header class="header">
+    <div>
+        <div class="brand-title">LIFE // OS</div>
+        <div class="brand-sub">PLAYER SYSTEM • COMMAND CENTER</div>
+    </div>
+    <div class="system">
+        SYS_STATUS: <strong id="systemStatus">ONLINE</strong><br>
+        PROTOCOL: <span class="pink">ACTIVE</span><br>
+        <span id="clock">--:--:--</span>
+    </div>
+</header>
+
+<div class="app-layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-title">NAVIGATION</div>
+    <nav class="nav" id="mainNav">
+        <button class="active" data-page="dashboard" onclick="openPage('dashboard', this)">⌂ DASHBOARD</button>
+        <button data-page="quests" onclick="openPage('quests', this)">⚔ QUESTS</button>
+        <button data-page="army" onclick="openPage('army', this)">🕶 SHADOW ARMY</button>
+        <button data-page="calendar" onclick="openPage('calendar', this)">📅 CALENDAR</button>
+        <button data-page="timer" onclick="openPage('timer', this)">⏱ TIMER</button>
+        <button data-page="stats" onclick="openPage('stats', this)">📊 STATS</button>
+        <button data-page="settings" onclick="openPage('settings', this)">⚙ SETTINGS</button>
+    </nav>
+
+    <div class="sidebar-title" style="margin-top:18px">CUSTOM PAGES</div>
+    <nav class="nav" id="customNav"></nav>
+    <button class="btn-add-page" onclick="showAddPageModal()">+ NEW PAGE</button>
+</aside>
+
+<!-- MAIN -->
+<main>
+
+<!-- ===================== DASHBOARD ===================== -->
+<section id="dashboard" class="page active">
+    <div class="page-header">
+        <div>
+            <h1>DASHBOARD</h1>
+            <p>Player status & daily overview</p>
+        </div>
+        <div id="todayDate" class="stat-label"></div>
+    </div>
+
+    <!-- PLAYER CARD -->
+    <div class="player-card">
+        <div class="player-left">
+            <div class="rank-badge" id="rankBadge">E</div>
+            <div>
+                <div class="player-name" id="playerName">Shadow Monarch</div>
+                <div class="player-title" id="playerTitle">E-Rank Hunter</div>
+            </div>
+        </div>
+        <div class="player-stats">
+            <div class="stat-block">
+                <div class="stat-label">LEVEL</div>
+                <div class="stat-value cyan" id="playerLevel">1</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-label">XP</div>
+                <div class="stat-value" id="playerXP">0 / 100</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-label">STREAK</div>
+                <div class="stat-value green" id="playerStreak">0</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-label">QUESTS DONE</div>
+                <div class="stat-value" id="playerQuestsDone">0</div>
+            </div>
+        </div>
+        <div class="xp-bar-wrap">
+            <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+            <div class="xp-text" id="xpText">0%</div>
+        </div>
+    </div>
+
+    <div class="grid grid-4" style="margin-top:18px">
+        <div class="card">
+            <div class="stat-label">TODAY PROGRESS</div>
+            <div class="stat-value" id="dashProgress">0%</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">WORK TODAY</div>
+            <div class="stat-value" id="dashWork">0m</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">ACTIVE QUESTS</div>
+            <div class="stat-value" id="dashActive">0</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">SHADOW ARMY</div>
+            <div class="stat-value purple" id="dashArmy">0</div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="card">
+            <div class="card-title">TODAY'S QUESTS</div>
+            <div id="todayQuestsList" class="task-list"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">CONTRIBUTION GRAPH</div>
+            <div class="contrib-header">
+                <span id="contribCount">0 contributions in the last year</span>
+            </div>
+            <div class="contrib-graph" id="contribGraph"></div>
+            <div class="contrib-legend">
+                <span>Less</span>
+                <span class="c0"></span><span class="c1"></span><span class="c2"></span><span class="c3"></span><span class="c4"></span>
+                <span>More</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== QUESTS ===================== -->
+<section id="quests" class="page">
+    <div class="page-header">
+        <div>
+            <h1>QUEST BOARD</h1>
+            <p>Manage daily, weekly, monthly & custom quests</p>
+        </div>
+        <button class="btn primary" onclick="showQuestModal()">+ NEW QUEST</button>
+    </div>
+
+    <div class="filter-bar">
+        <button class="filter active" data-filter="all" onclick="setQuestFilter('all', this)">ALL</button>
+        <button class="filter" data-filter="daily" onclick="setQuestFilter('daily', this)">DAILY</button>
+        <button class="filter" data-filter="weekly" onclick="setQuestFilter('weekly', this)">WEEKLY</button>
+        <button class="filter" data-filter="monthly" onclick="setQuestFilter('monthly', this)">MONTHLY</button>
+        <button class="filter" data-filter="once" onclick="setQuestFilter('once', this)">ONE-TIME</button>
+        <button class="filter" data-filter="done" onclick="setQuestFilter('done', this)">COMPLETED</button>
+    </div>
+
+    <div id="questList" class="task-list"></div>
+</section>
+
+<!-- ===================== SHADOW ARMY ===================== -->
+<section id="army" class="page">
+    <div class="page-header">
+        <div>
+            <h1>SHADOW ARMY</h1>
+            <p>Extract shadows from defeated quests. Command your legion.</p>
+        </div>
+        <div class="army-capacity">
+            <span class="stat-label">ARMY SIZE</span>
+            <span class="stat-value cyan" id="armySize">0 / 0</span>
+        </div>
+    </div>
+
+    <div class="grid grid-4" style="margin-bottom:18px">
+        <div class="card">
+            <div class="stat-label">TOTAL POWER</div>
+            <div class="stat-value purple" id="armyPower">0</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">XP BONUS</div>
+            <div class="stat-value green" id="armyXPBonus">+0%</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">HIGHEST GRADE</div>
+            <div class="stat-value" id="armyTopGrade">—</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">EXTRACTS TODAY</div>
+            <div class="stat-value" id="armyExtracts">0</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+        <div class="card-title">ARMY BONUSES</div>
+        <div id="armyBonuses" class="army-bonuses"></div>
+    </div>
+
+    <div class="filter-bar">
+        <button class="filter active" data-sfilter="all" onclick="setShadowFilter('all', this)">ALL</button>
+        <button class="filter" data-sfilter="soldier" onclick="setShadowFilter('soldier', this)">SOLDIER</button>
+        <button class="filter" data-sfilter="elite" onclick="setShadowFilter('elite', this)">ELITE</button>
+        <button class="filter" data-sfilter="knight" onclick="setShadowFilter('knight', this)">KNIGHT</button>
+        <button class="filter" data-sfilter="marshal" onclick="setShadowFilter('marshal', this)">MARSHAL</button>
+    </div>
+
+    <div id="shadowList" class="shadow-grid"></div>
+</section>
+
+<!-- ===================== CALENDAR ===================== -->
+<section id="calendar" class="page">
+    <div class="page-header">
+        <div>
+            <h1>CALENDAR & REMINDERS</h1>
+            <p>Schedule future quests and timed reminders</p>
+        </div>
+        <button class="btn primary" onclick="showReminderModal()">+ REMINDER</button>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-title">UPCOMING REMINDERS</div>
+            <div id="reminderList" class="task-list"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">SCHEDULED QUESTS</div>
+            <div id="scheduledList" class="task-list"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== TIMER ===================== -->
+<section id="timer" class="page">
+    <div class="page-header">
+        <div>
+            <h1>FOCUS TIMER</h1>
+            <p>Track work sessions & earn XP</p>
+        </div>
+    </div>
+
+    <div class="timer-display">
+        <div class="timer-time" id="timerDisplay">00:00:00</div>
+        <div class="timer-type" id="timerTypeLabel">Focus Session</div>
+        <div class="timer-controls">
+            <button class="btn" onclick="startTimer()">START</button>
+            <button class="btn" onclick="pauseTimer()">PAUSE</button>
+            <button class="btn danger" onclick="resetTimer()">RESET</button>
+        </div>
+        <div class="timer-options">
+            <select id="timerCategory">
+                <option value="Focus">Focus</option>
+                <option value="Study">Study</option>
+                <option value="Work">Work</option>
+                <option value="Training">Training</option>
+                <option value="Reading">Reading</option>
+            </select>
+            <label>XP / 25 min: <input type="number" id="timerXP" value="15" min="1" max="100" style="width:60px"></label>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+        <div class="card-title">TODAY'S SESSIONS</div>
+        <div id="sessionList" class="task-list"></div>
+    </div>
+</section>
+
+<!-- ===================== STATS ===================== -->
+<section id="stats" class="page">
+    <div class="page-header">
+        <div>
+            <h1>STATISTICS</h1>
+            <p>Progress, streaks & activity breakdown</p>
+        </div>
+    </div>
+
+    <div class="grid grid-3">
+        <div class="card">
+            <div class="stat-label">TOTAL XP EARNED</div>
+            <div class="stat-value cyan" id="statTotalXP">0</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">LONGEST STREAK</div>
+            <div class="stat-value green" id="statLongestStreak">0</div>
+        </div>
+        <div class="card">
+            <div class="stat-label">TOTAL WORK TIME</div>
+            <div class="stat-value" id="statTotalWork">0h</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <div class="card-title">ACTIVITY (LAST 7 DAYS)</div>
+        <div class="week-bars" id="weekBars"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <div class="card-title">CATEGORY BREAKDOWN</div>
+        <div id="categoryBreakdown"></div>
+    </div>
+</section>
+
+<!-- ===================== SETTINGS ===================== -->
+<section id="settings" class="page">
+    <div class="page-header">
+        <div>
+            <h1>SETTINGS</h1>
+            <p>Customize your player system</p>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-title">PLAYER PROFILE</div>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="setName" placeholder="Shadow Monarch">
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="setTitle" placeholder="E-Rank Hunter">
+            </div>
+            <button class="btn primary" onclick="saveProfile()">SAVE PROFILE</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">XP & LEVELING</div>
+            <div class="form-group">
+                <label>Base XP per Quest</label>
+                <input type="number" id="setBaseXP" value="20" min="1">
+            </div>
+            <div class="form-group">
+                <label>XP Multiplier (Daily Streak)</label>
+                <input type="number" id="setStreakMult" value="1.1" step="0.1" min="1">
+            </div>
+            <button class="btn primary" onclick="saveXPSettings()">SAVE XP SETTINGS</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">DATA</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">All data is stored in your browser (localStorage).</p>
+            <button class="btn" onclick="exportData()">EXPORT JSON</button>
+            <button class="btn" onclick="importData()">IMPORT JSON</button>
+            <button class="btn danger" onclick="resetAllData()">RESET ALL DATA</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">CUSTOM PAGES</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Create custom pages to organize quests by project or area of life.</p>
+            <div id="customPagesList"></div>
+            <button class="btn primary" style="margin-top:10px" onclick="showAddPageModal()">+ ADD PAGE</button>
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic custom pages will be injected here -->
+<div id="customPagesContainer"></div>
+
+</main>
+</div><!-- app-layout -->
+
+<!-- ===================== MODALS ===================== -->
+<div class="modal-overlay" id="questModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="questModalTitle">NEW QUEST</h2>
+            <button class="modal-close" onclick="closeModal('questModal')">×</button>
+        </div>
+        <div class="form-group">
+            <label>Quest Name</label>
+            <input type="text" id="qName" placeholder="Defeat the daily dungeon...">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Type</label>
+                <select id="qType">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="once">One-time</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="qPriority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Category / Tag</label>
+                <input type="text" id="qCategory" placeholder="Study, Work, Health...">
+            </div>
+            <div class="form-group">
+                <label>XP Reward</label>
+                <input type="number" id="qXP" value="20" min="1">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Due Date</label>
+                <input type="date" id="qDate">
+            </div>
+            <div class="form-group">
+                <label>Due Time (optional)</label>
+                <input type="time" id="qTime">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Page (optional)</label>
+            <select id="qPage">
+                <option value="">Main Board</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Notes</label>
+            <textarea id="qNotes" rows="2" placeholder="Extra details..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeModal('questModal')">CANCEL</button>
+            <button class="btn primary" onclick="saveQuest()">SAVE QUEST</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="reminderModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>NEW REMINDER</h2>
+            <button class="modal-close" onclick="closeModal('reminderModal')">×</button>
+        </div>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="rTitle" placeholder="Meeting with the Shadow Guild...">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="rDate">
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" id="rTime">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Notes</label>
+            <textarea id="rNotes" rows="2"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeModal('reminderModal')">CANCEL</button>
+            <button class="btn primary" onclick="saveReminder()">SAVE</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="pageModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>NEW CUSTOM PAGE</h2>
+            <button class="modal-close" onclick="closeModal('pageModal')">×</button>
+        </div>
+        <div class="form-group">
+            <label>Page Name</label>
+            <input type="text" id="pName" placeholder="Project X, Health, Finance...">
+        </div>
+        <div class="form-group">
+            <label>Icon (emoji)</label>
+            <input type="text" id="pIcon" value="📁" maxlength="2">
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeModal('pageModal')">CANCEL</button>
+            <button class="btn primary" onclick="savePage()">CREATE PAGE</button>
+        </div>
+    </div>
+</div>
+
+<!-- Level Up Toast -->
+<div class="toast" id="levelUpToast">
+    <div class="toast-title">LEVEL UP!</div>
+    <div class="toast-body" id="levelUpText">You reached Level 2</div>
+</div>
+
+<!-- Arise Toast -->
+<div class="toast arise-toast" id="ariseToast">
+    <div class="toast-title">ARISE</div>
+    <div class="toast-body" id="ariseText">A new shadow has joined your army</div>
+</div>
+
+<!-- Shadow Detail Modal -->
+<div class="modal-overlay" id="shadowModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="shadowModalTitle">SHADOW</h2>
+            <button class="modal-close" onclick="closeModal('shadowModal')">×</button>
+        </div>
+        <div id="shadowModalBody"></div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeModal('shadowModal')">CLOSE</button>
+            <button class="btn primary" id="shadowPromoteBtn" onclick="promoteShadow()">PROMOTE</button>
+            <button class="btn danger" id="shadowDismissBtn" onclick="dismissShadow()">DISMISS</button>
+        </div>
+    </div>
+</div>
+
+</div><!-- #app -->
+
+<script src="script.js"></script>
+</body>
+</html>
